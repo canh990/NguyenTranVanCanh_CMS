@@ -1,0 +1,14 @@
+/*
+Theme Name: MyTheme
+Theme URI: http://localhost/wordpress
+Author: Student
+Author URI: http://localhost
+Description: Custom WordPress theme built with Bootstrap 4 and Font Awesome 5 for learning purposes.
+Version: 1.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: mytheme
+*/
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');

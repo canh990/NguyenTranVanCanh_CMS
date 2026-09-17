@@ -1,6 +1,8 @@
 <?php
 /**
  * Template part for displaying posts
+ * Module 2: Content (FIT-TDC Style Post Listing)
+ * Reference: http://fit.tdc.edu.vn
  *
  * @link https://developer.wordpress.org/themes/basics/template-hierarchy/
  *
@@ -11,36 +13,21 @@
 
 ?>
 
-<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-	<header class="entry-header">
-		<?php if ( is_singular() ) : ?>
-			<?php the_title( '<h1 class="entry-title default-max-width">', '</h1>' ); ?>
-		<?php else : ?>
-			<?php the_title( sprintf( '<h2 class="entry-title default-max-width"><a href="%s">', esc_url( get_permalink() ) ), '</a></h2>' ); ?>
-		<?php endif; ?>
+<!-- ═══ MODULE 2: FIT-TDC POST CARD ═══ -->
+<article id="post-<?php the_ID(); ?>" <?php post_class( 'fit-tdc-post-card' ); ?>>
+	<!-- Date Box (Left) -->
+	<div class="fit-tdc-date-box">
+		<span class="fit-tdc-day"><?php echo esc_html( get_the_date( 'd' ) ); ?></span>
+		<span class="fit-tdc-month"><?php echo esc_html( 'THÁNG ' . get_the_date( 'm' ) ); ?></span>
+	</div>
 
-		<?php twenty_twenty_one_post_thumbnail(); ?>
-	</header><!-- .entry-header -->
-
-	<div class="entry-content">
-		<?php
-		the_content(
-			twenty_twenty_one_continue_reading_text()
-		);
-
-		wp_link_pages(
-			array(
-				'before'   => '<nav class="page-links" aria-label="' . esc_attr__( 'Page', 'twentytwentyone' ) . '">',
-				'after'    => '</nav>',
-				/* translators: %: Page number. */
-				'pagelink' => esc_html__( 'Page %', 'twentytwentyone' ),
-			)
-		);
-
-		?>
-	</div><!-- .entry-content -->
-
-	<footer class="entry-footer default-max-width">
-		<?php twenty_twenty_one_entry_meta_footer(); ?>
-	</footer><!-- .entry-footer -->
+	<!-- Content Box (Right) -->
+	<div class="fit-tdc-content-box">
+		<h2 class="fit-tdc-post-title">
+			<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+		</h2>
+		<div class="fit-tdc-post-excerpt">
+			<?php echo esc_html( function_exists( 'fit_tdc_get_post_excerpt' ) ? fit_tdc_get_post_excerpt( get_the_ID() ) : get_the_excerpt() ); ?>
+		</div>
+	</div>
 </article><!-- #post-<?php the_ID(); ?> -->

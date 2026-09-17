@@ -465,7 +465,15 @@ function twenty_twenty_one_scripts() {
 		'module-header-style',
 		get_template_directory_uri() . '/assets/css/module-header.css',
 		array( 'bootstrap' ),
-		'1.0'
+		time()
+	);
+
+	// Module 2 Content Stylesheet (FIT TDC post listing)
+	wp_enqueue_style(
+		'module-content-style',
+		get_template_directory_uri() . '/assets/css/module-content.css',
+		array( 'bootstrap' ),
+		time()
 	);
 
 	// Bootstrap 4 Bundle JS (includes Popper)
@@ -670,3 +678,104 @@ if ( ! function_exists( 'wp_get_list_item_separator' ) ) :
 		return __( ', ', 'twentytwentyone' );
 	}
 endif;
+
+/**
+ * ============================================================
+ * MODULE 2: CONTENT (FIT-TDC STYLE) HELPER FUNCTIONS
+ * ============================================================
+ */
+
+/**
+ * Custom excerpt helper for Module 2 FIT-TDC format
+ * Appends [...] to match screenshot requirements
+ */
+function fit_tdc_get_post_excerpt( $post_id = null, $num_words = 30 ) {
+	$post = get_post( $post_id );
+	if ( ! $post ) {
+		return '';
+	}
+
+	// 1. If explicit excerpt is specified
+	if ( ! empty( $post->post_excerpt ) ) {
+		$raw = trim( $post->post_excerpt );
+		// If already contains [...], return as is
+		if ( strpos( $raw, '[...]' ) !== false ) {
+			return $raw;
+		}
+		$text = wp_strip_all_tags( $raw );
+	} else {
+		// 2. Derive from content
+		$text = wp_strip_all_tags( strip_shortcodes( $post->post_content ) );
+	}
+
+	// Remove any existing trailing ellipsis or bracket variations
+	$text = preg_replace( '/\s*(\[\.{3}\]|\[\x{2026}\]|\x{2026}|\.{3})\s*$/u', '', $text );
+	$text = trim( $text );
+
+	if ( empty( $text ) ) {
+		return '';
+	}
+
+	// Trim to word limit
+	$trimmed = wp_trim_words( $text, $num_words, '' );
+	$trimmed = rtrim( $trimmed, " \t\n\r\0\x0B" );
+
+	if ( empty( $trimmed ) ) {
+		return '';
+	}
+
+	// Match screenshot formatting: if ends with a period, don't put space before [...]
+	if ( substr( $trimmed, -1 ) === '.' ) {
+		return $trimmed . '[...]';
+	} else {
+		return $trimmed . ' [...]';
+	}
+}
+
+/**
+ * Seed sample posts matching the assignment screenshot if requested
+ * Usage: Access http://localhost/.../?seed_tdc_posts=1 or run automatically if no posts exist
+ */
+function fit_tdc_seed_sample_posts() {
+	if ( ! isset( $_GET['seed_tdc_posts'] ) ) {
+		return;
+	}
+
+	$sample_posts = array(
+		array(
+			'post_title'   => 'LỊCH PHỎNG VẤN CHƯƠNG TRÌNH CNTT NHẬT BẢN 2021',
+			'post_excerpt' => 'Các sinh viên có tên trong danh sách vui lòng có mặt theo lịch để tham dự phỏng vấn.[...]',
+			'post_content' => 'Các sinh viên có tên trong danh sách vui lòng có mặt theo lịch để tham dự phỏng vấn. Sinh viên chuẩn bị đầy đủ hồ sơ và trang phục lịch sự khi tham gia phỏng vấn.',
+			'post_date'    => '2021-10-07 09:00:00',
+		),
+		array(
+			'post_title'   => 'FIT-TDC TỔ CHỨC BUỔI LIVESTREAM CHÀO ĐÓN TÂN SINH VIÊN FIT-TDC KHÓA 2021',
+			'post_excerpt' => 'Vào lúc 09:30 sáng 25/09/2021, FIT-TDC Tổ Chức Buổi Livestream chào đón Tân sinh viên FIT-TDC Khóa 2021 [...]',
+			'post_content' => 'Vào lúc 09:30 sáng 25/09/2021, FIT-TDC Tổ Chức Buổi Livestream chào đón Tân sinh viên FIT-TDC Khóa 2021 trên kênh fanpage chính thức của Khoa CNTT TDC.',
+			'post_date'    => '2021-10-03 09:30:00',
+		),
+		array(
+			'post_title'   => 'THỜI KHOÁ BIỂU HỌC KỲ I (DỰ KIẾN) NĂM HỌC 2021 - 2022',
+			'post_excerpt' => 'Thời khóa biểu học kỳ 1 (dự kiến) năm học 2021-2022. Ngành: không Chuyên Tiếng Anh - Cao Đẳng, TCCN Khóa 2021.[...]',
+			'post_content' => 'Thời khóa biểu học kỳ 1 (dự kiến) năm học 2021-2022. Ngành: không Chuyên Tiếng Anh - Cao Đẳng, TCCN Khóa 2021. Sinh viên theo dõi lịch học chi tiết trên cổng thông tin đào tạo.',
+			'post_date'    => '2021-09-24 08:00:00',
+		),
+	);
+
+	foreach ( $sample_posts as $post_data ) {
+		$existing = get_page_by_title( $post_data['post_title'], OBJECT, 'post' );
+		if ( ! $existing ) {
+			wp_insert_post( array(
+				'post_title'    => $post_data['post_title'],
+				'post_excerpt'  => $post_data['post_excerpt'],
+				'post_content'  => $post_data['post_content'],
+				'post_date'     => $post_data['post_date'],
+				'post_date_gmt' => $post_data['post_date'],
+				'post_status'   => 'publish',
+				'post_type'     => 'post',
+			) );
+		}
+	}
+}
+add_action( 'init', 'fit_tdc_seed_sample_posts' );
+
